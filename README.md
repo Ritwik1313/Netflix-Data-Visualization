@@ -8,14 +8,14 @@ Far more than a simple bar chart, this project showcases a complete approach to 
 
 This project highlights my strengths in:
 
-Front-end engineering (DOM manipulation, modern UI patterns, state updates)
+- Front-end engineering (DOM manipulation, modern UI patterns, state updates)
 
-Data visualization engineering (Chart.js configuration, custom tooltips, animations)
+- Data visualization engineering (Chart.js configuration, custom tooltips, animations)
 
-Data storytelling (auto-generated narrative summaries that adapt to user input)
+- Data storytelling (auto-generated narrative summaries that adapt to user input)
 
-Interface design & UX thinking (clear hierarchy, responsive layout, Netflix-inspired palette)
+- Interface design & UX thinking (clear hierarchy, responsive layout, Netflix-inspired palette)
 
-Rapid prototyping & product iteration (building a complete interactive tool within hours)
+- Rapid prototyping & product iteration (building a complete interactive tool within hours)
 
 The result is a compact but powerful demo that turns a synthetic dataset into a rich browsing experience, which definitively illustrates how careful engineering and thoughtful visualization can make data intuitive, entertaining, and instantly explorable.
