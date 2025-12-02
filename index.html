@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Streaming Genre Explorer — Ricky Hota</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #141414;
+      color: #f5f5f5;
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+    .author {
+      font-size: 0.9rem;
+      color: #e50914;
+      margin-top: -6px;
+      margin-bottom: 20px;
+    }
+    .tagline {
+      font-size: 0.95rem;
+      color: #b3b3b3;
+      margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    label {
+      font-size: 0.85rem;
+      color: #b3b3b3;
+    }
+    select {
+      margin-left: 6px;
+      padding: 4px 8px;
+      background: #1f1f1f;
+      color: #f5f5f5;
+      border-radius: 4px;
+      border: 1px solid #333;
+    }
+
+    /* Chart container card */
+    .chart-card {
+      background: #181818;
+      border-radius: 12px;
+      padding: 16px 16px 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      margin-bottom: 12px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Hover animation for chart card */
+    .chart-card:hover {
+      transform: scale(1.015);
+      box-shadow: 0 12px 32px rgba(229, 9, 20, 0.25);
+    }
+
+    canvas {
+      max-height: 360px;
+    }
+
+    /* Summary text */
+    .summary {
+      font-size: 0.95rem;
+      color: #e5e5e5;
+      margin-top: 8px;
+    }
+    .summary span.highlight {
+      color: #e50914;
+      font-weight: 600;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Streaming Genre Explorer</h1>
+    <p class="author">Created by Ricky Hota</p>
+
+    <p class="tagline">
+      A small data story exploring how audiences spend their viewing time by genre, year, and region.
+    </p>
+
+    <div class="controls">
+      <div>
+        <label for="yearSelect">Year
+          <select id="yearSelect">
+            <option value="2023">2023</option>
+            <option value="2024" selected>2024</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label for="regionSelect">Region
+          <select id="regionSelect">
+            <option value="Global" selected>Global</option>
+            <option value="US">United States</option>
+            <option value="India">India</option>
+            <option value="Brazil">Brazil</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <canvas id="genreChart"></canvas>
+      <p id="summary" class="summary"></p>
+    </div>
+
+    <p class="footer-note">
+      Sample dataset created for this portfolio project. Values represent relative viewing time in millions of hours.
+    </p>
+  </main>
+
+  <script>
+    // Synthetic dataset
+    const rawData = [
+      { year: 2023, region: "Global", genre: "Drama", hours: 430 },
+      { year: 2023, region: "Global", genre: "Comedy", hours: 360 },
+      { year: 2023, region: "Global", genre: "Action", hours: 510 },
+      { year: 2023, region: "Global", genre: "Documentary", hours: 210 },
+      { year: 2023, region: "US", genre: "Drama", hours: 220 },
+      { year: 2023, region: "US", genre: "Comedy", hours: 180 },
+      { year: 2023, region: "US", genre: "Action", hours: 260 },
+      { year: 2023, region: "US", genre: "Documentary", hours: 90 },
+      { year: 2023, region: "India", genre: "Drama", hours: 140 },
+      { year: 2023, region: "India", genre: "Comedy", hours: 110 },
+      { year: 2023, region: "India", genre: "Action", hours: 150 },
+      { year: 2023, region: "India", genre: "Documentary", hours: 60 },
+      { year: 2023, region: "Brazil", genre: "Drama", hours: 70 },
+      { year: 2023, region: "Brazil", genre: "Comedy", hours: 65 },
+      { year: 2023, region: "Brazil", genre: "Action", hours: 80 },
+      { year: 2023, region: "Brazil", genre: "Documentary", hours: 35 },
+      { year: 2024, region: "Global", genre: "Drama", hours: 480 },
+      { year: 2024, region: "Global", genre: "Comedy", hours: 390 },
+      { year: 2024, region: "Global", genre: "Action", hours: 550 },
+      { year: 2024, region: "Global", genre: "Documentary", hours: 260 },
+      { year: 2024, region: "US", genre: "Drama", hours: 240 },
+      { year: 2024, region: "US", genre: "Comedy", hours: 190 },
+      { year: 2024, region: "US", genre: "Action", hours: 280 },
+      { year: 2024, region: "US", genre: "Documentary", hours: 110 },
+      { year: 2024, region: "India", genre: "Drama", hours: 165 },
+      { year: 2024, region: "India", genre: "Comedy", hours: 130 },
+      { year: 2024, region: "India", genre: "Action", hours: 175 },
+      { year: 2024, region: "India", genre: "Documentary", hours: 70 },
+      { year: 2024, region: "Brazil", genre: "Drama", hours: 85 },
+      { year: 2024, region: "Brazil", genre: "Comedy", hours: 75 },
+      { year: 2024, region: "Brazil", genre: "Action", hours: 95 },
+      { year: 2024, region: "Brazil", genre: "Documentary", hours: 45 }
+    ];
+
+    const yearSelect = document.getElementById("yearSelect");
+    const regionSelect = document.getElementById("regionSelect");
+    const summaryEl = document.getElementById("summary");
+    const ctx = document.getElementById("genreChart").getContext("2d");
+
+    let chart;
+
+    function getFilteredData(year, region) {
+      return rawData.filter(d => d.year === year && d.region === region);
+    }
+
+    function buildSummary(year, region, labels, values) {
+      if (!labels.length) {
+        return `No data available for ${region} in ${year}.`;
+      }
+      const total = values.reduce((sum, v) => sum + v, 0);
+      const maxVal = Math.max(...values);
+      const topGenre = labels[values.indexOf(maxVal)];
+      const share = Math.round((maxVal / total) * 100);
+      return `In ${year}, <span class="highlight">${topGenre}</span> captured about <span class="highlight">${share}%</span> of viewing time in <span class="highlight">${region}</span> in this sample dataset.`;
+    }
+
+    function updateChart() {
+      const year = Number(yearSelect.value);
+      const region = regionSelect.value;
+      const filtered = getFilteredData(year, region);
+      const labels = filtered.map(d => d.genre);
+      const values = filtered.map(d => d.hours);
+
+      const data = {
+        labels,
+        datasets: [
+          {
+            label: "Millions of hours watched",
+            data: values,
+            backgroundColor: "#e50914",
+            hoverBackgroundColor: "#ff3344",
+            borderRadius: 6
+          }
+        ]
+      };
+
+      const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { color: "#f5f5f5" },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: "#b3b3b3" },
+            grid: { color: "#333" }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: { color: "#f5f5f5" }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.parsed.y} million hours`
+            }
+          }
+        },
+        animation: {
+          duration: 700,
+          easing: "easeOutQuart"
+        },
+        hover: {
+          mode: "nearest",
+          intersect: true
+        }
+      };
+
+      if (!chart) {
+        chart = new Chart(ctx, { type: "bar", data, options });
+      } else {
+        chart.data = data;
+        chart.options = options;
+        chart.update();
+      }
+
+      summaryEl.innerHTML = buildSummary(year, region, labels, values);
+    }
+
+    yearSelect.addEventListener("change", updateChart);
+    regionSelect.addEventListener("change", updateChart);
+
+    updateChart();
+  </script>
+</body>
+</html>
